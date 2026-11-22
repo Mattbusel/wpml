@@ -1,0 +1,34 @@
+[package]
+name = "wpml"
+version = "0.1.0"
+authors = ["Matt Busel <matt@busel.dev>"]
+edition = "2021"
+rust-version = "1.89"
+description = "DJI WPML waypoint missions in Rust: read and write the .kmz (wpmz/template.kml + wpmz/waylines.wpml) used by DJI Pilot 2, FlightHub 2, the Cloud API and MSDK v5, with typed mission config, waypoints and actions, any wpmz/1.0.x namespace, unknown elements kept, and an ArduPilot/PX4 mission bridge that maps the height datum explicitly instead of guessing"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/Mattbusel/wpml"
+documentation = "https://docs.rs/wpml"
+readme = "README.md"
+keywords = ["dji", "wpml", "kmz", "waypoint", "drone"]
+categories = ["aerospace::drones", "parser-implementations", "encoding", "command-line-utilities"]
+include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE-MIT", "/LICENSE-APACHE", "/tests/data/msdk_waypointsample.kmz", "/tests/data/LICENSE-MIT-dji-msdk-v5-samples"]
+
+[features]
+default = []
+## ArduPilot / PX4 missions to WPML through the `mavmission` crate: the `bridge` module.
+mavmission = ["dep:mavmission"]
+## Builds the `wpml` command line tool: `cargo install wpml --features cli`.
+cli = ["mavmission"]
+
+[[bin]]
+name = "wpml"
+path = "src/bin/wpml.rs"
+required-features = ["cli"]
+
+[dependencies]
+quick-xml = "0.42.0"
+zip = { version = "9.8.1", default-features = false, features = ["deflate-flate2-zlib-rs"] }
+mavmission = { version = "0.1.0", path = "../_partial-1122/mavmission", optional = true }
+
+[package.metadata.docs.rs]
+all-features = true
