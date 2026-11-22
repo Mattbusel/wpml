@@ -1,13 +1,26 @@
-# wpml: DJI waypoint missions in Rust, with the heights that don't fly into hills
+# wpml
+
+**A DJI mission planned at 50 m can fly 50 m underground, from one wrong height field the file format never flags. wpml is the Rust library that catches it.**
+
+```text
+$ wpml from-plan ArduPilotSITL-ArduCopter.plan -o out.kmz --drone m3e
+wpml: ArduPilotSITL-ArduCopter.plan: height: seq 4: frame GLOBAL is altitude above mean sea level (EGM96);
+DJI executeHeightMode WGS84 is height above the ellipsoid. They differ by the geoid separation N at the
+site. Pass it (ellipsoid minus EGM96, metres) or replan in GLOBAL_RELATIVE_ALT
+```
+
+It stopped at the one waypoint that would have flown off by the geoid separation. Most tools pick a datum and carry on.
+
+**[Live demo](https://mattbusel.github.io/drone-demos/)**
 
 [![crates.io](https://img.shields.io/crates/v/wpml.svg)](https://crates.io/crates/wpml)
+[![downloads](https://img.shields.io/crates/d/wpml.svg)](https://crates.io/crates/wpml)
 [![docs.rs](https://docs.rs/wpml/badge.svg)](https://docs.rs/wpml)
+[![license](https://img.shields.io/crates/l/wpml.svg)](#license)
 
-Read and write DJI WPML missions: the `.kmz` files that DJI Pilot 2,
-FlightHub 2, the Cloud API and MSDK v5 use for the Matrice 30/300/350,
-Mavic 3 Enterprise, Matrice 3D and the rest of the enterprise line. And
-convert an ArduPilot or PX4 mission into one, so one plan flies on both
-fleets.
+Read and write DJI WPML missions: the `.kmz` files that DJI Pilot 2, FlightHub 2, the Cloud API and MSDK v5 use for the Matrice 30/300/350, Mavic 3 Enterprise, Matrice 3D and the rest of the enterprise line. Every height datum is mapped explicitly instead of guessed, every `/wpmz/` namespace DJI has shipped is accepted, and elements wpml does not model are kept as raw XML and written back unchanged, so a round trip loses nothing. It is tested against the real KMZ files DJI publishes with MSDK v5 and the DJI Cloud API reference, and it converts an ArduPilot or PX4 mission into a DJI KMZ so one plan flies on both fleets. `MIT OR Apache-2.0`.
+
+## The height problem
 
 Most broken DJI missions are broken in one field. `executeHeightMode`
 `WGS84` means height above the **ellipsoid**, not above sea level, and the
